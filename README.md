@@ -21,8 +21,18 @@
 
 ## 🌐 서비스 아키텍쳐
 관리자 및 사용자의 리워드 시스템 Workflow
+<details>
+<summary>프로젝트 제출 아키텍처</summary>
 
 ![image](https://user-images.githubusercontent.com/60168922/227113224-7c897ac1-d738-4d4c-8a5b-2924cb9d400c.png)
+</details>
+
+<details>
+<summary>개인 보완 아키텍처</summary>
+
+<img src="https://user-images.githubusercontent.com/118710033/229508638-4e3dcf94-4935-4bb6-b6b3-b74be000104b.jpg" alt="png2pdf (1)_page-0001" width="600">
+
+</details>
 
 
 ## 📌 서비스 구성  
