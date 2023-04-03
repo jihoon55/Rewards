@@ -11,28 +11,46 @@
 
 ## 👋 팀 소개
 
-### 팀명| 김家네 Project
+### 팀명 | 김家네 Project
 ### 개발기간 | 2023.03.07 ~ 2023.03.23
 ### 멤버구성
 - 김상윤(조장) : 사용자 출석, 리워드 관리 ECS 서버 구축, ECS CI/CD 진행, 서버 IaC화 
-- 김지훈 : 
-- 김건 : 
-- 김태환 : 사용자 인증 시스템 중 Cognito 구현, 리워드 관리자 시스템 중 고객출석현황조회 리소스 구현
+- 김지훈 : 리워드 조회 및 재고 수량 조절, 일정 주기 별 재고 확인 서버리스 서버 구현, DynamoDB구현, Lambda 및 APIgateway, DB IaC화
+- 김건 : 리워드 알림 서버리스 서버 및 SQS-DLQ 구현 및 IaC화
+- 김태환 : 사용자 인증 시스템 중 Cognito 구현 및 IaC화, 관리자 시스템 중 고객출석현황조회 리소스 구현 
 
 ## 🌐 서비스 아키텍쳐
-관리자 및 사용자의 리워드 시스템 사용 데이
+관리자 및 사용자의 리워드 시스템 Workflow
+
 ![image](https://user-images.githubusercontent.com/60168922/227113224-7c897ac1-d738-4d4c-8a5b-2924cb9d400c.png)
 
 
 ## 📌 서비스 구성  
 <details>
 <summary>데이터베이스 및 ERD 다이어그램</summary>
+
 ![image](https://user-images.githubusercontent.com/60168922/227113444-466c8c6a-ea9f-421a-9bb0-32397cde176b.png)
-테이블 설명 간단히
+ 
+
+### Users 테이블
+유저를 확인할 수 있는 id와 유저를 확인할 수 있게 username항목을, 유저가 사용할 수 있는 현금성 서비스를 확인하기 위해 user_point를, 해당 유저가 얼마나 출석을 했는지 확인할 수 있게 count를 넣었다.
+
+
+### Attendance 테이블
+출석을 확인할 수 있는 테이블로 출석을 확인할 수 있는 id를 넣고 유저별로 확인 할 수 있게 user_id를, 어떤 날에 출석을 확인했는지 확인하기 위해 date를 넣었다.
+ 
+
+### Rewards 테이블
+리워드를 확인 할 수 있는 id와 어떤 유저가 리워드를 받았는지 확인하기 위해 유저를 확인하는 user_id와 상품을 확인하는 product_id, 수령가능한 리워드의 필요한 출석 수를 확인하기 위해 reward_time을 넣었다
+ 
+
+### Products 테이블
+상품을 확인할 수 있는 id와 상품 이름을 등록한 name, 현재 보유중인 상태를 확인하기 위해 condition, 특정 개수를 유지 하기 위해 remain을 넣었다.
 </details>
 
 <details>
 <summary>유저 정보 인증</summary>
+
 ![image](https://user-images.githubusercontent.com/60168922/227113444-466c8c6a-ea9f-421a-9bb0-32397cde176b.png)
 - 이미 사용자가 쇼핑몰 회원으로 등록 되어 있다
 가정하고 토큰을 Cognito로부터 가져와 사용
@@ -46,6 +64,7 @@ Cognito 로 보내 인증 진행
 
 <details>
 <summary>유저 출석, 리워드 도메인</summary>
+
 ![image](https://user-images.githubusercontent.com/60168922/227114966-fed76633-486f-47c3-9a0b-578e390da95d.png)
 - 출석관리, 받을 수 있는 리워드 확인, 리워드
 수령 기능 제공
@@ -58,6 +77,7 @@ Auto scaling group을 활용
 
 <details>
 <summary>이벤트 관리자, 알림 도메인</summary>
+
 ![image](https://user-images.githubusercontent.com/60168922/227115098-8a9b47ae-807f-4324-b907-96dc47ae2451.png)
 #### 관리자 도메인
 - 상품 재고 관리 , 리워드 출석 현황 관리 기능
@@ -74,6 +94,7 @@ Auto scaling group을 활용
 
 <details>
 <summary>CI/CD (github actions, CodeBuild ..) & IaC (Terraform)</summary>
+
 ![image](https://user-images.githubusercontent.com/60168922/227115335-eecf1e75-6fac-40eb-9af8-41ce5c1552f1.png)
 - 출석관리, 받을 수 있는 리워드 확인, 리워드
 수령 기능 제공
@@ -85,38 +106,52 @@ Auto scaling group을 활용
 </details>
 
 ## 💪 무엇을 배웠는가?
-* fastiy 프레임워크를 이용한 컨테이너 배포 방법을 알게됐습니다.
-  * fastify 서버를 시작하면 로컬호스트 주소로 동작하므로 AWS에 컨테이너를 띄워도 접속할 수 없다. 따라서, package.json에서 -a 옵션으로 0.0.0.0 주소로 시작할 수 있도록 해야한다.
-* GitHub Action을 이용한 ECS 자동화 동작 원리를 알고, Json파일을 이용한 CI/CD를 알 수 있었습니다.
-  * ECR, ECS Workflow파일에 대해 공부할 수 있었음.
-* AWS Secrets Manager을 이용한 데이터베이스 Task Definition에 환경변수를 설정할 수 있었습니다.
-  * AWS Secrets Manager를 사용하기 위해서는 ECS역할에 Secrets Manager ReadWrite정책을 추가해줘야 사용할 수 있음.
-* ECS 배포 시 새로운 이미지가 배포되지 않는 오류가 트러블 슈팅
-  * 배포가 완료되도 성곡적인 배포가 아니기 때문에 완료된 부분이라도 배재하지 말고 트래픽의 흐림을 순차적으로 생각하게됨.
-  * 오류가 나타나지 않아도 실행되는 서비스에 로그를 확인해야 되는것을 알게 됨.
+* Cognito를 이용해 사용자 인증을 구현할 수 있었습니다.
+  * Cognito는 userpool, identitypool을 이용해 인증 인가를 할 수 있음
+  * userpool을 이용해 토큰 인증 서비스를 구현
+* DynamoDB에 대해 공부 할 수 있었음
+  * DynamoDB
+  * 개꿀띠
+* VPC외부 서비스와 연결 방법에 대해 공부할 수 있었음
+  * VPC외부 서비스를 이용하기 위해서는 vpcENDpoint가 필요함.
+  * vpc엔드포인트에 대한 설명
+* Public, Private 서브넷에 통신 방법에 대해 정리 할 수 있었습니다.
+  * baston, natgateway, ELB
+* Eventbridge에 Cron Event생성 방법을 배웠습니다.
+  * eventbridge 설명
+* Lambda 서버리스 스크립트를 공부 할 수 있었습니다.
+  * 람다 설명
+* SES 사용 설명
+* Terraform을 통한 DynamoDB 생성 방법을 배웠다.
+
 
 ## 🚨 트러블 슈팅
 * 문제 상황
-GitHub Action사용 시 ECS 배포는 정삭적으로 작동하지만 실행 시간이 26분이었으며, 배포 된 이미지는 새로운 이미지가 아닌 기존에 이미지가 배포된 상태였다.
+Terraform을 이용해 APIgateway를 구현 완료 후 테스트 시 에러 발생
 
 * 원인 파악
 문제가 될 수 있는 부분을 먼저 추려보았다
- - 깃허브 액션
- - 클러스터 서비스 설정
- - task definition
-
-먼저 배포가 정상적으로 됐기 때문에 GitHub Action Workflow에서는 문제가 없다 판단했다.
-
-그 후 클러스터 서비스와 Task Definition를 재설정하지만 똑같이 배포 시간과 오류가 발생하고 있었다
-
+ - Terraform 리소스 부족
+ - 권한 부여
+ - Lambda zip파일 오류
  
- 여기서 실수가 테스크, 서비스 로그를 확인했어야 했지만 다른 방법으로 오류를 찾아 나섰다 만약 이때 로그를 확인했으면 더 빠른 방법으로 오류를 찾을 수 있었다(캡쳐한 로그 기록이 없다..)
-2. 배포가 됐다고 다른 배재하고 다른 문제를 찾는게 아니라 순차적으로 과정을 생각하자 결국 ecr에서 ecs로 가는 과정 즉 워크플로우에서 설정 내용이 문제인 것 처럼
-처음부터 모든 설정을 확인했지만 크게 잘 못 설정된 부분은 없었다
+Cloudwatch 확인 시 아무 응답도 없었음
+Lambda만 테스트 해본 결과 람다는 정삭적으로 실행되는것을 확인
+여기서 문제
+Terraform에 리소스가 잘 못 됐다는것을 확인
+확인 결과 잘못된 리소스는 없었음
+
+콘솔에서 APIgateway를 확인해본 결과 Restapi로 동작하고 있었음
+내가 만든 Lambda는 HTTP통신으로 동작함
+
+Terraform으로 apigateway를 만들경우 restapi가 기본값으로 생각함
+공식문서를 찾아보니 v2리소스를 이용해 HTTP
+
 
 * 문제 해결
-처음부터 트래픽에 흐름에 맞게 순차적으로 확인해 보니 Workflow파일에 ECR_Registry가 정답이지만 내 파일에는 Registry만 적혀져 있었습니다.
-Workflow 내용을 공부하면서 직접 작성했던것이 에러를 만들었던 원인이 었고 ECR_Registry로 수정 후 3분 이내로 새로운 이미지가 배포되었습니다.
+테라폼 공식 문서 확인 결과 v2라는 HTTP통신을 위한 리소스를 확인
+restapi리소스를 v2리소스들로 교체
+작동 완료
 
 
 ## 📋 블로깅 & 레퍼런스
