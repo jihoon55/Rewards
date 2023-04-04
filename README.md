@@ -166,9 +166,9 @@ Terraform을 이용해 APIgateway를 구현 완료 후 테스트 시 에러 발�
 
 ###  원인 파악
 * 문제가 될 수 있는 부분을 먼저 추려보았습니다.
- * Terraform 리소스 부족
- * 권한 미부여
- * Lambda zip파일 오류
+  * Terraform 리소스 부족
+  * 권한 미부여
+  * Lambda zip파일 오류
  
 * Cloudwatch 확인 시 아무 응답도 없었습니다.
 * Lambda만 테스트 해본 결과 람다는 정삭적으로 실행되며, Terraform apigateway의 리소스가 잘 못 됐다는것을 확인했습니다.
@@ -180,7 +180,7 @@ Terraform을 이용해 APIgateway를 구현 완료 후 테스트 시 에러 발�
 * Terraform으로 apigateway를 만들경우 restapi가 기본값으로 생각했었습니다.
 * 공식문서를 찾아본 결과 aws_apigatewayv2_api라는 HTTP 통신을 위한 리소스가 있는걸 확인했습니다.
 * 테라폼 공식 문서 확인 결과 v2라는 HTTP통신을 위한 리소스를 확인
-aws_api_gateway_rest_api리소스를 aws_apigatewayv2_api리소스로 수정 후 정상적으로 실행되었습니다.
+* aws_api_gateway_rest_api리소스를 aws_apigatewayv2_api리소스로 수정 후 정상적으로 실행되었습니다.
 
 
 ## 📋 블로깅 & 레퍼런스
