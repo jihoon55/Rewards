@@ -15,7 +15,7 @@
 ### 개발기간 | 2023.03.07 ~ 2023.03.23
 ### 멤버구성
 - 김상윤(조장) : 사용자 출석, 리워드 관리 ECS 서버 구축, ECS CI/CD 진행, 서버 IaC화 
-- 김지훈 : 리워드 조회 및 재고 수량 조절, 일정 주기 별 재고 확인 서버리스 서버 구현, DynamoDB구현, Lambda 및 APIgateway, DB IaC화
+- 김지훈 : 리워드 조회 및 재고 수량 조절, 이벤트 별 재고 확인 람다 서버 구축, DB구축, 람다 및 APIgateway, DB IaC화
 - 김건 : 리워드 알림 서버리스 서버 및 SQS-DLQ 구현 및 IaC화
 - 김태환 : 사용자 인증 시스템 중 Cognito 구현 및 IaC화, 관리자 시스템 중 고객출석현황조회 리소스 구현 
 
@@ -42,33 +42,34 @@
 ![image](https://user-images.githubusercontent.com/60168922/227113444-466c8c6a-ea9f-421a-9bb0-32397cde176b.png)
  
 
+##DynamoDB
+db간단한 설명 도입 경배경
+
 ### Users 테이블
-유저를 확인할 수 있는 id와 유저를 확인할 수 있게 username항목을, 유저가 사용할 수 있는 현금성 서비스를 확인하기 위해 user_point를, 해당 유저가 얼마나 출석을 했는지 확인할 수 있게 count를 넣었다.
+유저를 확인할 수 있는 id와 유저를 확인할 수 있게 username항목을, 유저가 사용할 수 있는 현금성 서비스를 확인하기 위해 user_point를, 해당 유저가 얼마나 출석을 했는지 확인할 수 있게 count를 넣었습니다.
 
 
 ### Attendance 테이블
-출석을 확인할 수 있는 테이블로 출석을 확인할 수 있는 id를 넣고 유저별로 확인 할 수 있게 user_id를, 어떤 날에 출석을 확인했는지 확인하기 위해 date를 넣었다.
+출석을 확인할 수 있는 테이블로 출석을 확인할 수 있는 id를 넣고 유저별로 확인 할 수 있게 user_id를, 어떤 날에 출석을 확인했는지 확인하기 위해 date를 넣었습니다.
  
 
 ### Rewards 테이블
-리워드를 확인 할 수 있는 id와 어떤 유저가 리워드를 받았는지 확인하기 위해 유저를 확인하는 user_id와 상품을 확인하는 product_id, 수령가능한 리워드의 필요한 출석 수를 확인하기 위해 reward_time을 넣었다
+리워드를 확인 할 수 있는 id와 어떤 유저가 리워드를 받았는지 확인하기 위해 유저를 확인하는 user_id와 상품을 확인하는 product_id, 수령가능한 리워드의 필요한 출석 수를 확인하기 위해 reward_time을 넣었습니다
  
 
 ### Products 테이블
-상품을 확인할 수 있는 id와 상품 이름을 등록한 name, 현재 보유중인 상태를 확인하기 위해 condition, 특정 개수를 유지 하기 위해 remain을 넣었다.
+상품을 확인할 수 있는 id와 상품 이름을 등록한 name, 현재 보유중인 상태를 확인하기 위해 condition, 특정 개수를 유지 하기 위해 remain을 넣었습니다.
 </details>
 
 <details>
-<summary>유저 정보 인증</summary>
+<summary>유저 정보 인증 </summary>
 
 ![image](https://user-images.githubusercontent.com/60168922/227113444-466c8c6a-ea9f-421a-9bb0-32397cde176b.png)
-- 이미 사용자가 쇼핑몰 회원으로 등록 되어 있다
-가정하고 토큰을 Cognito로부터 가져와 사용
-- 이벤트 시스템의 root path에 들어왔을 때 토큰을
-Cognito 로 보내 인증 진행
-- 그 이후 유저 인증 여부를 boolean 값으로
-저장해두고 출석 및 리워드 기능을 수행할 때 인증
-여부 확인
+코그니토 설명경도입배경
+
+- 이미 사용자가 쇼핑몰 회원으로 등록 되어 있다 가정하고 토큰을 Cognito로부터 가져와 사용했습니다.
+- 이벤트 시스템의 root path에 들어왔을 때 토큰을 Cognito로 보내 인증 진행했습니다.
+- 그 이후 유저 인증 여부를 boolean 값으로 저장해두고 출석 및 리워드 기능을 수행할 때 인증 여부를 확인했습니다.
 </details>
 
 
@@ -76,6 +77,8 @@ Cognito 로 보내 인증 진행
 <summary>유저 출석, 리워드 도메인</summary>
 
 ![image](https://user-images.githubusercontent.com/60168922/227114966-fed76633-486f-47c3-9a0b-578e390da95d.png)
+ECS 도입배경
+
 - 출석관리, 받을 수 있는 리워드 확인, 리워드
 수령 기능 제공
 - VPC 외부에 있는 dynamoDB와 연동하기 위해
@@ -90,6 +93,8 @@ Auto scaling group을 활용
 
 ![image](https://user-images.githubusercontent.com/60168922/227115098-8a9b47ae-807f-4324-b907-96dc47ae2451.png)
 #### 관리자 도메인
+람다 
+
 - 상품 재고 관리 , 리워드 출석 현황 관리 기능
 제공
 - 서버리스 아키텍처 구현을 위해 Lambda 사용
