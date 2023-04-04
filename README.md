@@ -42,9 +42,12 @@
 ![image](https://user-images.githubusercontent.com/60168922/227113444-466c8c6a-ea9f-421a-9bb0-32397cde176b.png)
  
 
-##DynamoDB
-db간단한 설명 도입 경배경
-
+### AmazonDynamoDB
+Amazon DynamoDB는 완전관리형 NoSQL 서버리스 데이터베이스 서비스입니다.
+DynamoDB는 프로비저닝 및 온디맨드 용량 모드를 모두 제공하므로 테이블당 용량을 지정하거나 사용한 리소스에 대해서만 비용을 지불함으로써 비용을 최적화할 수 있습니다.
+리워드 시스템 프로젝트에 필요한 서버들은 Lambda, Fagate 서버리스이며 Lambda와 DynamoDB는 모두 서버리스이기 때문에 인프라 관리 및 운영 비용을 크게 줄일 수 있습니다. 
+서버리스 아키텍처에서는 인프라가 필요한 경우에만 비용이 발생하므로, 트래픽이 낮거나 트래픽의 피크 시간이 짧은 애플리케이션의 경우에는 람다와 다이나모디비의 조합이 매우 경제적인 장점이 있어 사용하게 되었습니다.
+  
 ### Users 테이블
 유저를 확인할 수 있는 id와 유저를 확인할 수 있게 username항목을, 유저가 사용할 수 있는 현금성 서비스를 확인하기 위해 user_point를, 해당 유저가 얼마나 출석을 했는지 확인할 수 있게 count를 넣었습니다.
 
@@ -64,9 +67,16 @@ db간단한 설명 도입 경배경
 <details>
 <summary>유저 정보 인증 </summary>
 
-![image](https://user-images.githubusercontent.com/60168922/227113444-466c8c6a-ea9f-421a-9bb0-32397cde176b.png)
+![image](https://user-images.githubusercontent.com/60168922/227114056-e74a3df8-b4fa-4b03-8d11-b1c00c757c4a.png)
 코그니토 설명경도입배경
 
+### Cognito
+AWS Cognito를 사용하면 사용자 인증 및 권한 부여를 관리하는 데 필요한 작업을 단순화하고, 사용자 인증 및 권한 부여를 안전하고 쉽게 구현할 수 있습니다. 
+  
+  
+애플리케이션에서 사용자 인증과 권한 부여를 구현하는 것이 복잡하고 보안에 민감하기 때문에 Cognito를 사용해 보안성을 높이고 사용자 데이터를 보호하기 위해 선택했습니다.
+
+  
 - 이미 사용자가 쇼핑몰 회원으로 등록 되어 있다 가정하고 토큰을 Cognito로부터 가져와 사용했습니다.
 - 이벤트 시스템의 root path에 들어왔을 때 토큰을 Cognito로 보내 인증 진행했습니다.
 - 그 이후 유저 인증 여부를 boolean 값으로 저장해두고 출석 및 리워드 기능을 수행할 때 인증 여부를 확인했습니다.
@@ -77,8 +87,14 @@ db간단한 설명 도입 경배경
 <summary>유저 출석, 리워드 도메인</summary>
 
 ![image](https://user-images.githubusercontent.com/60168922/227114966-fed76633-486f-47c3-9a0b-578e390da95d.png)
-ECS 도입배경
 
+### ECS 클러스터
+모든 서버가 컨테이너 환경 또는 서버리스로 구현되길 원하는 요구 사항을 바탕으로 ECS를 사용하였습니다.
+  
+  
+ecs는 Multi AZ 기능과 auto scaling을 통한 높은 확장성 그리고 다른 컨테이너 오케스트레이션에 비해 간단한 구성과 운영이 가능하기 때문에 저희 서비스에 최적의 도구라고 생각하여 선택하게 되었습니다.
+  
+  
 - 출석관리, 받을 수 있는 리워드 확인, 리워드
 수령 기능 제공
 - VPC 외부에 있는 dynamoDB와 연동하기 위해
@@ -92,12 +108,22 @@ Auto scaling group을 활용
 <summary>이벤트 관리자, 알림 도메인</summary>
 
 ![image](https://user-images.githubusercontent.com/60168922/227115098-8a9b47ae-807f-4324-b907-96dc47ae2451.png)
-#### 관리자 도메인
-람다 
+#### 관리자 도메인 
+
+### Lambda
+모든 서버가 컨테이너 환경 또는 서버리스로 구현되길 원하는 요구 사항을 바탕으로 Lambda를 사용하였습니다.
+  
+  
+Lambda를 사용하면 서버 관리, 확장, 보안 등과 같은 작업을 서비스 제공업체(AWS)가 모두 처리해줌으로서, 서버 기반의 애플리케이션 개발 및 운영에 비해 시간과 비용을 크게 절약할 수 있게 해줍니다.
+  
+  
+리워드 시스템 프로젝트에서는 소수의 관리자가 운영을 하기 떄문에 비용적으로 코드를 실행하고, 실행 시간에 따라 사용한 만큼만 비용을 지불하면 되어 선택하게 되었습니다.
+ 
 
 - 상품 재고 관리 , 리워드 출석 현황 관리 기능
 제공
 - 서버리스 아키텍처 구현을 위해 Lambda 사용
+  
 #### 재고 확인 알림 도메인
 - Event Bridge의 cron기능을 활용해 매일
 주기적으로 재고 조회
@@ -111,68 +137,55 @@ Auto scaling group을 활용
 <summary>CI/CD (github actions, CodeBuild ..) & IaC (Terraform)</summary>
 
 ![image](https://user-images.githubusercontent.com/60168922/227115335-eecf1e75-6fac-40eb-9af8-41ce5c1552f1.png)
-- 출석관리, 받을 수 있는 리워드 확인, 리워드
-수령 기능 제공
-- VPC 외부에 있는 dynamoDB와 연동하기 위해
-dynamoDB 용 VPC endpoint 사용
-- 가용성 확보를 위해 Application Load Balancer와
-Auto scaling group을 활용
+- 출석관리, 받을 수 있는 리워드 확인, 리워드 수령 기능 제공
+- VPC 외부에 있는 dynamoDB와 연동하기 위해 dynamoDB 용 VPC endpoint 사용
+- 가용성 확보를 위해 AZ를 나누고 Application Load Balancer와 Auto scaling group을 활용
 - 서버리스 아키텍처를 구현을 위해 Fargate 사용
 </details>
 
 ## 💪 무엇을 배웠는가?
 * Cognito를 이용해 사용자 인증을 구현할 수 있었습니다.
   * Cognito는 userpool, identitypool을 이용해 인증 인가를 할 수 있음
-  * userpool을 이용해 토큰 인증 서비스를 구현
+  * userpool을 이용해 토큰 인증 서비스를 구현함.
 * DynamoDB에 대해 공부 할 수 있었음
   * DynamoDB
   * 개꿀띠
-* VPC외부 서비스와 연결 방법에 대해 공부할 수 있었음
-  * VPC외부 서비스를 이용하기 위해서는 vpcENDpoint가 필요함.
+* VPC외부 서비스와 연결 방법에 대해 공부하여 VPCendpoint를 구현했습니다.
   * vpc엔드포인트에 대한 설명
 * Public, Private 서브넷에 통신 방법에 대해 정리 할 수 있었습니다.
-  * baston, natgateway, ELB
-* Eventbridge에 Cron Event생성 방법을 배웠습니다.
-  * eventbridge 설명
-* Lambda 서버리스 스크립트를 공부 할 수 있었습니다.
-  * 람다 설명
-* SES 사용 설명
-* Terraform을 통한 DynamoDB 생성 방법을 배웠다.
+  * baston: 인터넷을 통해 접속 가능한 공개 서브넷에 배치되며, Private Subnet의 리소스에 접근할 수 있도록 합니다.
+  * natgateway: Private Subnet의 인스턴스가 인터넷을 통해 패킷을 보낼 수 있게 합니다.
+* Eventbridge에 Cron Event생성 방법을 공부하고 Lambda에 트리거 시켰습니다.
+* SES를 활용하여 Email을 전송 시스템을 구현할 수 있었습니다.
+* Terraform을 통한 DynamoDB 생성 방법을 배웠습니다.
 
 
 ## 🚨 트러블 슈팅
-* 문제 상황
+###  문제 상황
 Terraform을 이용해 APIgateway를 구현 완료 후 테스트 시 에러 발생
 
-* 원인 파악
-문제가 될 수 있는 부분을 먼저 추려보았다
- - Terraform 리소스 부족
- - 권한 부여
- - Lambda zip파일 오류
+###  원인 파악
+* 문제가 될 수 있는 부분을 먼저 추려보았습니다.
+ * Terraform 리소스 부족
+ * 권한 미부여
+ * Lambda zip파일 오류
  
-Cloudwatch 확인 시 아무 응답도 없었음
-Lambda만 테스트 해본 결과 람다는 정삭적으로 실행되는것을 확인
-여기서 문제
-Terraform에 리소스가 잘 못 됐다는것을 확인
-확인 결과 잘못된 리소스는 없었음
-
-콘솔에서 APIgateway를 확인해본 결과 Restapi로 동작하고 있었음
-내가 만든 Lambda는 HTTP통신으로 동작함
-
-Terraform으로 apigateway를 만들경우 restapi가 기본값으로 생각함
-공식문서를 찾아보니 v2리소스를 이용해 HTTP
+* Cloudwatch 확인 시 아무 응답도 없었습니다.
+* Lambda만 테스트 해본 결과 람다는 정삭적으로 실행되며, Terraform apigateway의 리소스가 잘 못 됐다는것을 확인했습니다.
+* 확인 결과 잘못된 리소스는 없었습니다.
+* 콘솔에서 APIgateway를 확인해본 결과 estapi로 동작하고 있었으며, Lambda는 HTTP통신으로 동작하고 있었습니다.
 
 
-* 문제 해결
-테라폼 공식 문서 확인 결과 v2라는 HTTP통신을 위한 리소스를 확인
-restapi리소스를 v2리소스들로 교체
-작동 완료
+### 문제 해결
+* Terraform으로 apigateway를 만들경우 restapi가 기본값으로 생각했었습니다.
+* 공식문서를 찾아본 결과 aws_apigatewayv2_api라는 HTTP 통신을 위한 리소스가 있는걸 확인했습니다.
+* 테라폼 공식 문서 확인 결과 v2라는 HTTP통신을 위한 리소스를 확인
+aws_api_gateway_rest_api리소스를 aws_apigatewayv2_api리소스로 수정 후 정상적으로 실행되었습니다.
 
 
 ## 📋 블로깅 & 레퍼런스
 * 블로깅
-  * https://jihoon555.tistory.com/58
-  * https://jihoon555.tistory.com/59
+
  
 * 레퍼런스 
   * https://www.fastify.io/
