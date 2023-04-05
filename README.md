@@ -15,7 +15,7 @@
 ### 개발기간 | 2023.03.07 ~ 2023.03.23
 ### 멤버구성
 - 김상윤(조장) : 사용자 출석, 리워드 관리 ECS 서버 구축, ECS CI/CD 진행, 서버 IaC화 
-- 김지훈 : 리워드 조회 및 재고 수량 조절, 이벤트 별 재고 확인 람다 서버 구축, DB구축, 람다 및 APIgateway, DB IaC화
+- 김지훈 : 리워드 조회 및 재고 수량 조절, 이벤트 재고 확인 람다 서버 구축, DB구축, 람다 및 APIgateway, DB IaC화
 - 김건 : 리워드 알림 서버리스 서버 및 SQS-DLQ 구현 및 IaC화
 - 김태환 : 사용자 인증 시스템 중 Cognito 구현 및 IaC화, 관리자 시스템 중 고객출석현황조회 리소스 구현 
 
@@ -25,6 +25,12 @@
 <summary>프로젝트 제출 아키텍처</summary>
 
 ![image](https://user-images.githubusercontent.com/60168922/227113224-7c897ac1-d738-4d4c-8a5b-2924cb9d400c.png)
+</details>
+
+<details>
+<summary>ECS CI/CD 워크플로우</summary>
+
+![KakaoTalk_20230405_231227539](https://user-images.githubusercontent.com/118710033/230121397-0e99b29a-d2cb-4e71-ac4e-900f108db98c.png)
 </details>
 
 <details>
@@ -137,26 +143,26 @@ Lambda를 사용하면 서버 관리, 확장, 보안 등과 같은 작업을 서
 <summary>CI/CD (github actions, CodeBuild ..) & IaC (Terraform)</summary>
 
 ![image](https://user-images.githubusercontent.com/60168922/227115335-eecf1e75-6fac-40eb-9af8-41ce5c1552f1.png)
-- 출석관리, 받을 수 있는 리워드 확인, 리워드 수령 기능 제공
-- VPC 외부에 있는 dynamoDB와 연동하기 위해 dynamoDB 용 VPC endpoint 사용
-- 가용성 확보를 위해 AZ를 나누고 Application Load Balancer와 Auto scaling group을 활용
-- 서버리스 아키텍처를 구현을 위해 Fargate 사용
 </details>
 
 ## 💪 무엇을 배웠는가?
 * Cognito를 이용해 사용자 인증을 구현할 수 있었습니다.
   * Cognito는 userpool, identitypool을 이용해 인증 인가를 할 수 있음
   * userpool을 이용해 토큰 인증 서비스를 구현함.
-* DynamoDB에 대해 공부 할 수 있었음 - 좀 더 정리하기!!!
+* DynamoDB에 테이블을 만들고 조회 하며 공부 할 수 있었습니다. 
+  * Amazon DynamoDB는 완전관리형 NoSQL 서버리스 데이터베이스 서비스임
 * VPC외부 서비스와 연결 방법에 대해 공부하여 VPCendpoint를 구현했습니다.
-  * vpc엔드포인트에 대한 설명하기!!!
+  * Interface 엔드포인트: VPC 내의 ENI를 사용하여 vpc외부 AWS 서비스와 엑세스 가능하게함.
+  * Gateway 엔드포인트: VPC 내의 라우팅 테이블을 사용하여 S3와 DynamoDB에 대한 엑세스를 가능하게함.
+   각각의 인터페이스 엔드포인트는 특정 AWS 서비스에 대해 생성됩니다.
 * Public, Private 서브넷에 통신 방법에 대해 정리 할 수 있었습니다.
   * baston: 인터넷을 통해 접속 가능한 공개 서브넷에 배치되며, Private Subnet의 리소스에 접근할 수 있도록 합니다.
   * natgateway: Private Subnet의 인스턴스가 인터넷을 통해 패킷을 보낼 수 있게 합니다.
 * Eventbridge에 Cron Event생성 방법을 공부하고 Lambda에 트리거 시켰습니다.
 * SES를 활용하여 Email을 전송 시스템을 구현할 수 있었습니다.
 * SQS - SNS를 이용해 내결함성을 확보할 수 있었습니다.
-  * 정리하기!!!
+  * SQS는 분산 대기 서비스로서 메시지를 안정적으로 전달하는 기능을 제공함.
+  * SNS는 분산 푸시 알림 서비스로서 메시지를 다양한 프로토콜을 통해 전송하는 기능을 제공함.
 * Terraform을 통한 DynamoDB 생성 방법을 배웠습니다.
 
 
@@ -184,11 +190,21 @@ Terraform을 이용해 APIgateway를 구현 완료 후 테스트 시 에러 발�
 
 
 ## 📋 블로깅 & 레퍼런스
-* 블로깅
+<details>
+<summary>블로깅</summary>
 
- 
-* 레퍼런스 
-  * https://www.fastify.io/
-  * https://github.com/fastify/fastify-cli
-  * https://github.com/aws-actions/amazon-ecr-login
-  * https://hub.docker.com/_/mongo
+
+</details>
+
+
+<details>
+<summary>레퍼런스</summary>
+
+https://docs.aws.amazon.com/ko_kr/cognito/latest/developerguide/what-is-amazon-cognito.html
+https://docs.aws.amazon.com/cognito/latest/developerguide/user-pool-settings-attributes.html#user-pool-settings-attribute-mapping
+https://docs.aws.amazon.com/ko_kr/vpc/latest/privatelink/endpoint-services-overview.html
+https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/vpc-endpoints-dynamodb.html
+https://docs.aws.amazon.com/vpc/latest/userguide/vpc-nat-gateway.html
+https://dynobase.dev/dynamodb-terraform/
+https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/apigatewayv2_api
+</details>
