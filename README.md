@@ -147,16 +147,16 @@ Lambda를 사용하면 서버 관리, 확장, 보안 등과 같은 작업을 서
 * Cognito를 이용해 사용자 인증을 구현할 수 있었습니다.
   * Cognito는 userpool, identitypool을 이용해 인증 인가를 할 수 있음
   * userpool을 이용해 토큰 인증 서비스를 구현함.
-* DynamoDB에 대해 공부 할 수 있었음
-  * DynamoDB
-  * 개꿀띠
+* DynamoDB에 대해 공부 할 수 있었음 - 좀 더 정리하기!!!
 * VPC외부 서비스와 연결 방법에 대해 공부하여 VPCendpoint를 구현했습니다.
-  * vpc엔드포인트에 대한 설명
+  * vpc엔드포인트에 대한 설명하기!!!
 * Public, Private 서브넷에 통신 방법에 대해 정리 할 수 있었습니다.
   * baston: 인터넷을 통해 접속 가능한 공개 서브넷에 배치되며, Private Subnet의 리소스에 접근할 수 있도록 합니다.
   * natgateway: Private Subnet의 인스턴스가 인터넷을 통해 패킷을 보낼 수 있게 합니다.
 * Eventbridge에 Cron Event생성 방법을 공부하고 Lambda에 트리거 시켰습니다.
 * SES를 활용하여 Email을 전송 시스템을 구현할 수 있었습니다.
+* SQS - SNS를 이용해 내결함성을 확보할 수 있었습니다.
+  * 정리하기!!!
 * Terraform을 통한 DynamoDB 생성 방법을 배웠습니다.
 
 
