@@ -74,7 +74,6 @@ DynamoDB는 프로비저닝 및 온디맨드 용량 모드를 모두 제공하�
 <summary>유저 정보 인증 </summary>
 
 ![image](https://user-images.githubusercontent.com/60168922/227114056-e74a3df8-b4fa-4b03-8d11-b1c00c757c4a.png)
-코그니토 설명경도입배경
 
 ### Cognito
 AWS Cognito를 사용하면 사용자 인증 및 권한 부여를 관리하는 데 필요한 작업을 단순화하고, 사용자 인증 및 권한 부여를 안전하고 쉽게 구현할 수 있습니다. 
